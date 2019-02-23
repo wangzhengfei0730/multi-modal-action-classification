@@ -7,6 +7,8 @@ import numpy as np
 NUM_DIMENSION = 3
 NUM_JOINTS = 25
 NUM_PERSON = 2
+# according to statistics, reference skeleton_statistics.html
+MAX_SEQUENCE_LENGTH = 800
 
 
 def retrieve_content(file_path):
@@ -31,31 +33,39 @@ def frames_preprocess(frames):
     num_frames = len(frames)
     for dim in range(NUM_DIMENSION):
         sequence = []
-        for i in range(num_frames):
+        for i in range(MAX_SEQUENCE_LENGTH):
             joints = []
-            for j in range(NUM_JOINTS):
-                persons = []
-                for p in range(NUM_PERSON):
-                    person = float(frames[i][p * NUM_DIMENSION * NUM_JOINTS + j * NUM_DIMENSION + dim])
-                    persons.append(person)
-                joints.append(persons)
+            if i < num_frames:
+                for j in range(NUM_JOINTS):
+                    persons = []
+                    for p in range(NUM_PERSON):
+                        person = float(frames[i][p * NUM_DIMENSION * NUM_JOINTS + j * NUM_DIMENSION + dim])
+                        persons.append(person)
+                    joints.append(persons)
+            else:
+                for j in range(NUM_JOINTS):
+                    persons = [0.0, 0.0]
+                    joints.append(persons)
             sequence.append(joints)
         processed.append(sequence)
     return np.array(processed)
 
 # assign the directory of labels and skeleton data
-lable_dir = './PKU-MMD/Label/'
-skeleton_dir = './PKU-MMD/Data/skeleton/'
+dataset_dir = './PKUMMDv2'
+lable_dir = os.path.join(dataset_dir, 'Label')
+skeleton_dir = os.path.join(dataset_dir, 'Data/skeleton')
 assert os.path.exists(lable_dir), 'label directory does not exist'
 assert os.path.exists(skeleton_dir), 'skeleton directory does not exist'
 # output directory of processed data
-processed_dir = './PKU-MMD/Data/skeleton_processed/'
+processed_dir = os.path.join(dataset_dir, 'Data/skeleton_processed')
 if not os.path.exists(processed_dir):
     os.mkdir(processed_dir)
 
 for label_file in os.listdir(lable_dir):
+    # avoid file like .DS_Store
     if '.txt' not in label_file:
         continue
+
     data_id = label_file.split('.')[0]
     label_path = os.path.join(lable_dir, label_file)
     skeleton_path = os.path.join(skeleton_dir, data_id + '.txt')
@@ -76,14 +86,7 @@ for label_file in os.listdir(lable_dir):
         s_time, e_time = start_times[i], end_times[i]
         frames = skeletons[s_time:e_time + 1]
         preprocessed = frames_preprocess(frames)
-        print(preprocessed.shape)
-        # print(preprocessed)
-        
-        # with open(output_path, 'wb') as fp:
-        #     pickle.dump(preprocessed, fp)
-        
-        # with open(output_path, 'rb') as fp:
-        #     content = pickle.load(fp)
-        
-        # print(content)
-
+        # print(preprocessed.shape)
+        print('processing skeleton data: {} - NO.{} action'.format(data_id, i + 1))
+        with open(output_path, 'wb') as fp:
+            pickle.dump(preprocessed, fp)
