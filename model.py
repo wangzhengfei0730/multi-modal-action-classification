@@ -64,13 +64,13 @@ class HCN(nn.Module):
             nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Dropout2d(p=0.5),
-            nn.MaxUnpool2d(2)
+            nn.MaxPool2d(2)
         )
         self.conv6 = nn.Sequential(
             nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Dropout2d(p=0.5),
-            nn.MaxUnpool2d(2)
+            nn.MaxPool2d(2)
         )
         self.fc7 = nn.Sequential(
             nn.Linear(256 * 4 * 4, 256 * self.num_persons),
