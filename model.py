@@ -23,6 +23,7 @@ class HCN(nn.Module):
     def __init__(
         self, 
         in_channel=3, num_joints=25,
+        sequence_length=800,
         num_persons=2, num_classes=NUM_ACTION_CLASSES
     ):
         super(HCN, self).__init__()
@@ -34,7 +35,7 @@ class HCN(nn.Module):
             nn.Conv2d(in_channels=in_channel, out_channels=64, kernel_size=1, stride=1, padding=0),
             nn.ReLU()
         )
-        self.sequence_conv2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=(3, 1), stride=1, padding=(1, 0))
+        self.sequence_conv2 = nn.Conv2d(in_channels=64, out_channels=sequence_length, kernel_size=(3, 1), stride=1, padding=(1, 0))
         self.sequence_conv3 = nn.Sequential(
             nn.Conv2d(in_channels=num_joints, out_channels=32, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(2)
@@ -49,7 +50,7 @@ class HCN(nn.Module):
             nn.Conv2d(in_channels=in_channel, out_channels=64, kernel_size=1, stride=1, padding=0),
             nn.ReLU()
         )
-        self.motion_conv2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=(3, 1), stride=1, padding=(1, 0))
+        self.motion_conv2 = nn.Conv2d(in_channels=64, out_channels=sequence_length, kernel_size=(3, 1), stride=1, padding=(1, 0))
         self.motion_conv3 = nn.Sequential(
             nn.Conv2d(in_channels=num_joints, out_channels=32, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(2)
@@ -73,7 +74,7 @@ class HCN(nn.Module):
             nn.MaxPool2d(2)
         )
         self.fc7 = nn.Sequential(
-            nn.Linear(256 * 4 * 4, 256 * self.num_persons),
+            nn.Linear(256 * (sequence_length // 16) * (sequence_length // 16), 256 * self.num_persons),
             nn.ReLU(),
             nn.Dropout2d(p=0.5)
         )
