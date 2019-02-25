@@ -3,16 +3,16 @@ import argparse
 import pickle
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets
 
 from model import HCN
 
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset-dir', type=str, default='PKUMMDv2/Data/skeleton_processed', help='dataset directory')
+parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
 parser.add_argument('--batch-size', type=int, default=16, help='batch size')
 parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
 parser.add_argument('--num-epochs', type=int, default=10, help='number of epochs for training')
@@ -33,7 +33,7 @@ def load_data(dataset_dir, batch_size, num_workers):
     return dataloader, dataset_size
 
 
-def train(model, dataloader, num_epochs, dataset_size):
+def train(model, dataloader, num_epochs, dataset_size, device):
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
     for epoch in range(num_epochs):
@@ -51,7 +51,7 @@ def train(model, dataloader, num_epochs, dataset_size):
             with torch.set_grad_enabled(True):
                 outputs = model(inputs)
                 _, preds = torch.max(outputs, 1)
-                loss = model.loss_fn(preds, labels)
+                loss = nn.CrossEntropyLoss()(outputs, labels)
                 loss.backward()
                 optimizer.step()
             running_loss += loss.item() * inputs.size(0)
@@ -70,10 +70,14 @@ def evaluate():
 
 
 def main():
+    device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
     dataloader, dataset_size = load_data(args.dataset_dir, args.batch_size, args.num_workers)
     model = HCN()
-    model = train(model, dataloader, args.num_epochs, dataset_size)
-    torch.save(model.state_dict(), args.checkpoint_path)
+    if args.gpu and torch.cuda.is_available():
+        model = torch.nn.DataParallel(model)
+    model.to(device)
+    model = train(model, dataloader, args.num_epochs, dataset_size, device)
+    torch.save(model.module.state_dict(), args.checkpoint_path)
 
 
 if __name__ == '__main__':

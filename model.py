@@ -118,9 +118,6 @@ class HCN(nn.Module):
 
         return out
 
-    def loss_fn(self, outputs, labels):
-        return nn.CrossEntropyLoss()(outputs, labels)
-
 
 if __name__ == '__main__':
     model = HCN()
