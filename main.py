@@ -64,8 +64,8 @@ def train(model, dataloader, num_epochs, dataset_size, device):
         epoch_accuracy = running_corrects.double() / dataset_size
 
         print('  Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_accuracy))
-        writer.add_scalar('loss', epoch_loss)
-        writer.add_scalar('accuracy', epoch_accuracy)
+        writer.add_scalar('loss', epoch_loss, epoch)
+        writer.add_scalar('accuracy', epoch_accuracy, epoch)
     
     return model
 
