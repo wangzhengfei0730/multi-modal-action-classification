@@ -6,8 +6,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets
+from tensorboardX import SummaryWriter
 
 from model import HCN
+
+
+writer = SummaryWriter()
 
 
 parser = argparse.ArgumentParser()
@@ -34,6 +38,7 @@ def load_data(dataset_dir, batch_size, num_workers):
 
 
 def train(model, dataloader, num_epochs, dataset_size, device):
+    model.train()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
     for epoch in range(num_epochs):
@@ -42,8 +47,6 @@ def train(model, dataloader, num_epochs, dataset_size, device):
         
         running_loss = 0.0
         running_corrects = 0
-
-        model.train()
 
         for inputs, labels in dataloader:
             inputs, labels = inputs.to(device), labels.to(device)
@@ -61,6 +64,8 @@ def train(model, dataloader, num_epochs, dataset_size, device):
         epoch_accuracy = running_corrects.double() / dataset_size
 
         print('  Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_accuracy))
+        writer.add_scalar('loss', epoch_loss)
+        writer.add_scalar('accuracy', epoch_accuracy)
     
     return model
 
@@ -78,6 +83,7 @@ def main():
     model.to(device)
     model = train(model, dataloader, args.num_epochs, dataset_size, device)
     torch.save(model.module.state_dict(), args.checkpoint_path)
+    writer.close()
 
 
 if __name__ == '__main__':

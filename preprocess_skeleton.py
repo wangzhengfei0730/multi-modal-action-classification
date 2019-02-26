@@ -8,7 +8,7 @@ NUM_DIMENSION = 3
 NUM_JOINTS = 25
 NUM_PERSON = 2
 # according to statistics, reference skeleton_statistics.html
-MAX_SEQUENCE_LENGTH = 800
+MAX_SEQUENCE_LENGTH = 400
 
 
 def retrieve_content(file_path):
@@ -29,6 +29,9 @@ def parse_label(label_path):
 
 
 def frames_preprocess(frames):
+    # compress sequence length using lower sampling rate
+    if len(frames) > MAX_SEQUENCE_LENGTH:
+        frames[:] = frames[::2]
     processed = []
     num_frames = len(frames)
     for dim in range(NUM_DIMENSION):
