@@ -4,13 +4,6 @@ import pickle
 import numpy as np
 
 
-NUM_DIMENSION = 3
-NUM_JOINTS = 25
-NUM_PERSON = 2
-# according to statistics, reference skeleton_statistics.html
-MAX_SEQUENCE_LENGTH = 200
-
-
 def retrieve_content(file_path):
     with open(file_path, 'r') as fp:
         content = fp.readlines()
@@ -29,29 +22,28 @@ def parse_label(label_path):
 
 
 def frames_preprocess(frames):
-    # compress sequence length using lower sampling rate
-    while len(frames) > MAX_SEQUENCE_LENGTH:
-        frames[:] = frames[::2]
     processed = []
     num_frames = len(frames)
     for dim in range(NUM_DIMENSION):
         sequence = []
-        for i in range(MAX_SEQUENCE_LENGTH):
+        for i in range(num_frames):
             joints = []
-            if i < num_frames:
-                for j in range(NUM_JOINTS):
-                    persons = []
-                    for p in range(NUM_PERSON):
-                        person = float(frames[i][p * NUM_DIMENSION * NUM_JOINTS + j * NUM_DIMENSION + dim])
-                        persons.append(person)
-                    joints.append(persons)
-            else:
-                for j in range(NUM_JOINTS):
-                    persons = [0.0, 0.0]
-                    joints.append(persons)
+            for j in range(NUM_JOINTS):
+                persons = []
+                for p in range(NUM_PERSON):
+                    person = float(frames[i][p * NUM_DIMENSION * NUM_JOINTS + j * NUM_DIMENSION + dim])
+                    persons.append(person)
+                joints.append(persons)
             sequence.append(joints)
         processed.append(sequence)
-    return np.array(processed)
+    processed = np.array(processed)
+    return np.resize(processed, (NUM_DIMENSION, MAX_SEQUENCE_LENGTH, NUM_JOINTS, NUM_PERSON))
+
+
+NUM_DIMENSION = 3
+NUM_JOINTS = 25
+NUM_PERSON = 2
+MAX_SEQUENCE_LENGTH = 64
 
 # assign the directory of labels and skeleton data
 dataset_dir = './PKUMMDv2'
@@ -89,7 +81,7 @@ for label_file in os.listdir(lable_dir):
         s_time, e_time = start_times[i], end_times[i]
         frames = skeletons[s_time:e_time + 1]
         preprocessed = frames_preprocess(frames)
-        # print(preprocessed.shape)
         print('processing skeleton data: {} - NO.{} action'.format(data_id, i + 1))
+        print('shape:', preprocessed.shape)
         with open(output_path, 'wb') as fp:
             pickle.dump(preprocessed, fp)

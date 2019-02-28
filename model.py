@@ -23,7 +23,7 @@ class HCN(nn.Module):
     def __init__(
         self, 
         in_channel=3, num_joints=25,
-        sequence_length=200,
+        sequence_length=64,
         num_persons=2, num_classes=NUM_ACTION_CLASSES
     ):
         super(HCN, self).__init__()
