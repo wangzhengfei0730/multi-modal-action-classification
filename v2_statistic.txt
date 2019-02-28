@@ -1,0 +1,55 @@
+skeleton directory: ./PKUMMDv2/Data/skeleton
+label directory: ./PKUMMDv2/Label
+PKU-MMD v2 does not contain data in class: [12, 14, 16, 18, 21, 24, 26, 27, 29, 38]
+dataset statistic:
+action class:  1, total number = 117, average =  49, max =  84
+action class:  2, total number = 152, average = 104, max = 795
+action class:  3, total number = 118, average =  73, max = 157
+action class:  4, total number = 192, average =  60, max = 165
+action class:  5, total number = 117, average =  61, max = 151
+action class:  6, total number = 117, average =  68, max = 121
+action class:  7, total number = 117, average = 135, max = 481
+action class:  8, total number = 273, average =  97, max = 492
+action class:  9, total number = 117, average =  40, max =  96
+action class: 10, total number = 236, average = 110, max = 404
+action class: 11, total number = 234, average =  38, max = 147
+action class: 12, total number =   0, average =   0, max =   0
+action class: 13, total number =  78, average =  74, max = 134
+action class: 14, total number =   0, average =   0, max =   0
+action class: 15, total number = 126, average =  56, max = 128
+action class: 16, total number =   0, average =   0, max =   0
+action class: 17, total number = 283, average =  50, max = 215
+action class: 18, total number =   0, average =   0, max =   0
+action class: 19, total number = 115, average =  34, max =  67
+action class: 20, total number = 194, average = 109, max = 473
+action class: 21, total number =   0, average =   0, max =   0
+action class: 22, total number = 117, average =  73, max = 187
+action class: 23, total number = 195, average = 114, max = 571
+action class: 24, total number =   0, average =   0, max =   0
+action class: 25, total number = 117, average =  58, max = 117
+action class: 26, total number =   0, average =   0, max =   0
+action class: 27, total number =   0, average =   0, max =   0
+action class: 28, total number = 192, average =  85, max = 306
+action class: 29, total number =   0, average =   0, max =   0
+action class: 30, total number = 274, average = 179, max = 772
+action class: 31, total number = 115, average =  71, max = 132
+action class: 32, total number = 152, average =  56, max = 154
+action class: 33, total number = 272, average =  41, max = 180
+action class: 34, total number = 337, average =  24, max = 109
+action class: 35, total number =  78, average =  66, max = 286
+action class: 36, total number = 196, average =  44, max = 188
+action class: 37, total number = 153, average = 116, max = 266
+action class: 38, total number =   0, average =   0, max =   0
+action class: 39, total number = 232, average =  71, max = 336
+action class: 40, total number = 191, average = 109, max = 609
+action class: 41, total number = 154, average =  39, max = 136
+action class: 42, total number = 157, average =  76, max = 203
+action class: 43, total number = 190, average =  79, max = 211
+action class: 44, total number = 115, average =  80, max = 165
+action class: 45, total number = 193, average =  86, max = 259
+action class: 46, total number = 122, average =  80, max = 613
+action class: 47, total number = 116, average = 136, max = 771
+action class: 48, total number = 236, average = 193, max = 533
+action class: 49, total number = 115, average =  54, max = 122
+action class: 50, total number = 195, average =  72, max = 194
+action class: 51, total number = 152, average =  84, max = 364
