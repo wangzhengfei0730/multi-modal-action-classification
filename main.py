@@ -17,12 +17,13 @@ writer = SummaryWriter()
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset-dir', type=str, default='PKUMMDv2/Data/skeleton_processed', help='dataset directory')
 parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
-parser.add_argument('--batch-size', type=int, default=128, help='batch size')
-parser.add_argument('--learning-rate', type=float, default=1e-5, help='learning rate')
-parser.add_argument('--num-epochs', type=int, default=100, help='number of epochs for training')
+parser.add_argument('--batch-size', type=int, default=64, help='batch size')
+parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
+parser.add_argument('--num-epochs', type=int, default=400, help='number of epochs for training')
 parser.add_argument('--num-workers', type=int, default=4, help='number of workers for multiprocessing')
 parser.add_argument('--checkpoint-path', type=str, default='checkpoint.pt', help='checkpoint file path')
 parser.add_argument('--seed', type=int, default=429, help='random seed')
+parser.add_argument('--evaluation', default=False, action='store_true', help='whether to evaluate the model')
 
 
 def pickle_loader(path):
@@ -31,47 +32,74 @@ def pickle_loader(path):
 
 
 def load_data(dataset_dir, batch_size, num_workers):
-    pkummd_dataset = datasets.DatasetFolder(root=args.dataset_dir, loader=pickle_loader, extensions=['pkl'])
-    dataset_size = len(pkummd_dataset)
-    dataloader = torch.utils.data.DataLoader(pkummd_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    return dataloader, dataset_size
+    if args.evaluation:
+        test_dataset = datasets.DatasetFolder(root=os.path.join(args.dataset_dir, 'test'), loader=pickle_loader, extensions=['pkl'])
+        test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        return test_dataset_loader, len(test_dataset)
+    else:
+        train_val_dataset = {
+            tag: datasets.DatasetFolder(root=os.path.join(args.dataset_dir, tag), loader=pickle_loader, extensions=['pkl'])
+            for tag in ['train', 'val']
+        }
+        train_val_dataset_size = {tag: len(train_val_dataset[tag]) for tag in ['train', 'val']}
+        train_val_dataset_loader = {
+            tag: torch.utils.data.DataLoader(train_val_dataset[tag], batch_size=batch_size, shuffle=True, num_workers=num_workers)
+            for tag in ['train', 'val']
+        }
+        return train_val_dataset_loader, train_val_dataset_size
 
 
 def train(model, dataloader, num_epochs, dataset_size, device):
-    model.train()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch + 1, num_epochs))
         print('-' * 10)
-        
-        running_loss = 0.0
-        running_corrects = 0
+        epoch_loss = {'train': 0.0, 'val': 0.0}
+        epoch_accuracy = {'train': 0.0, 'val': 0.0}
 
-        for inputs, labels in dataloader:
-            inputs, labels = inputs.to(device), labels.to(device)
-            optimizer.zero_grad()
-            with torch.set_grad_enabled(True):
-                outputs = model(inputs)
-                _, preds = torch.max(outputs, 1)
-                loss = nn.CrossEntropyLoss()(outputs, labels)
-                loss.backward()
-                optimizer.step()
-            running_loss += loss.item() * inputs.size(0)
-            running_corrects += torch.sum(preds == labels)
+        for phase in ['train', 'val']:
+            running_loss = 0.0
+            running_corrects = 0
+            if phase is 'train':
+                model.train()
+            else:
+                model.eval()
+            
+            for inputs, labels in dataloader[phase]:
+                inputs, labels = inputs.to(device), labels.to(device)
+                optimizer.zero_grad()
+                with torch.set_grad_enabled(phase is 'train'):
+                    outputs = model(inputs)
+                    _, preds = torch.max(outputs, 1)
+                    loss = nn.CrossEntropyLoss()(outputs, labels)
+                    if phase is 'train':
+                        loss.backward()
+                        optimizer.step()
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
         
-        epoch_loss = running_loss / dataset_size
-        epoch_accuracy = running_corrects.double() / dataset_size
+            epoch_loss[phase] = running_loss / dataset_size[phase]
+            epoch_accuracy[phase] = running_corrects.double() / dataset_size[phase]
+            print('  {} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss[phase], epoch_accuracy[phase]))
 
-        print('  Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_accuracy))
-        writer.add_scalar('loss', epoch_loss, epoch)
-        writer.add_scalar('accuracy', epoch_accuracy, epoch)
+        writer.add_scalars('loss', {'train': epoch_loss['train'], 'val': epoch_loss['val']}, epoch)
+        writer.add_scalars('accuracy', {'train': epoch_accuracy['train'], 'val': epoch_accuracy['val']}, epoch)
     
     return model
 
 
-def evaluate():
-    pass
+def evaluate(model, dataloader, dataset_size, device):
+    model.eval()
+    corrects = 0
+    for inputs, labels in dataloader['test']:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+        outputs = model(inputs)
+        _, preds = torch.max(outputs, 1)
+        corrects += torch.sum(preds == labels.data)
+    acc = corrects.double() / dataset_size['test']
+    return acc.item()
 
 
 def main():

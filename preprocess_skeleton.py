@@ -43,7 +43,7 @@ def frames_preprocess(frames):
 NUM_DIMENSION = 3
 NUM_JOINTS = 25
 NUM_PERSON = 2
-MAX_SEQUENCE_LENGTH = 64
+MAX_SEQUENCE_LENGTH = 256
 
 # assign the directory of labels and skeleton data
 dataset_dir = './PKUMMDv2'
@@ -55,6 +55,9 @@ assert os.path.exists(skeleton_dir), 'skeleton directory does not exist'
 processed_dir = os.path.join(dataset_dir, 'Data/skeleton_processed')
 if not os.path.exists(processed_dir):
     os.mkdir(processed_dir)
+
+NUM_ACTIONS = 51
+num_each_action = [0] * NUM_ACTIONS
 
 for label_file in os.listdir(lable_dir):
     # avoid file like .DS_Store
@@ -72,6 +75,7 @@ for label_file in os.listdir(lable_dir):
 
     for i in range(num_actions):
         cur_action_class = action_classes[i]
+        num_each_action[cur_action_class - 1] += 1
         output_dir = os.path.join(processed_dir, '{:02d}'.format(cur_action_class))
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
@@ -85,3 +89,5 @@ for label_file in os.listdir(lable_dir):
         print('shape:', preprocessed.shape)
         with open(output_path, 'wb') as fp:
             pickle.dump(preprocessed, fp)
+
+print('number of each actions:', num_each_action)
