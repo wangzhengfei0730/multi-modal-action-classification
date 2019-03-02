@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import pickle
 import numpy as np
@@ -40,13 +41,14 @@ def frames_preprocess(frames):
     return np.resize(processed, (NUM_DIMENSION, MAX_SEQUENCE_LENGTH, NUM_JOINTS, NUM_PERSON))
 
 
+dataset_dir = sys.argv[1]
+MAX_SEQUENCE_LENGTH = int(sys.argv[2])
+
 NUM_DIMENSION = 3
 NUM_JOINTS = 25
 NUM_PERSON = 2
-MAX_SEQUENCE_LENGTH = 256
 
 # assign the directory of labels and skeleton data
-dataset_dir = './PKUMMDv2'
 lable_dir = os.path.join(dataset_dir, 'Label')
 skeleton_dir = os.path.join(dataset_dir, 'Data/skeleton')
 assert os.path.exists(lable_dir), 'label directory does not exist'
@@ -58,6 +60,8 @@ if not os.path.exists(processed_dir):
 
 NUM_ACTIONS = 51
 num_each_action = [0] * NUM_ACTIONS
+
+print('preprocessing...')
 
 for label_file in os.listdir(lable_dir):
     # avoid file like .DS_Store
@@ -85,9 +89,10 @@ for label_file in os.listdir(lable_dir):
         s_time, e_time = start_times[i], end_times[i]
         frames = skeletons[s_time:e_time + 1]
         preprocessed = frames_preprocess(frames)
-        print('processing skeleton data: {} - NO.{} action'.format(data_id, i + 1))
-        print('shape:', preprocessed.shape)
+        # print('processing skeleton data: {} - NO.{} action'.format(data_id, i + 1))
+        # print('shape:', preprocessed.shape)
         with open(output_path, 'wb') as fp:
             pickle.dump(preprocessed, fp)
 
+print('preprocess finished!')
 print('number of each actions:', num_each_action)

@@ -15,7 +15,8 @@ writer = SummaryWriter()
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset-dir', type=str, default='PKUMMDv2/Data/skeleton_processed', help='dataset directory')
+parser.add_argument('--dataset-dir', type=str, default='PKUMMDv2', help='dataset directory')
+parser.add_argument('--sequence-length', type=int, default=128, help='sequence length of every action')
 parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
 parser.add_argument('--batch-size', type=int, default=64, help='batch size')
 parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
@@ -33,12 +34,12 @@ def pickle_loader(path):
 
 def load_data(dataset_dir, batch_size, num_workers):
     if args.evaluation:
-        test_dataset = datasets.DatasetFolder(root=os.path.join(args.dataset_dir, 'test'), loader=pickle_loader, extensions=['pkl'])
+        test_dataset = datasets.DatasetFolder(root=os.path.join(dataset_dir, 'test'), loader=pickle_loader, extensions=['pkl'])
         test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
         return test_dataset_loader, len(test_dataset)
     else:
         train_val_dataset = {
-            tag: datasets.DatasetFolder(root=os.path.join(args.dataset_dir, tag), loader=pickle_loader, extensions=['pkl'])
+            tag: datasets.DatasetFolder(root=os.path.join(dataset_dir, tag), loader=pickle_loader, extensions=['pkl'])
             for tag in ['train', 'val']
         }
         train_val_dataset_size = {tag: len(train_val_dataset[tag]) for tag in ['train', 'val']}
@@ -49,7 +50,17 @@ def load_data(dataset_dir, batch_size, num_workers):
         return train_val_dataset_loader, train_val_dataset_size
 
 
+def save_model(model, tag):
+    if tag is 'top':
+        torch.save(model.module.state_dict(), 'top-checkpoint.pt')
+    elif tag is 'final':
+        torch.save(model.module.state_dict(), 'final-checkpoint.pt')
+    else:
+        raise NotImplementedError
+
+
 def train(model, dataloader, num_epochs, dataset_size, device):
+    top_accuracy = 0.0
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     
     for epoch in range(num_epochs):
@@ -83,6 +94,11 @@ def train(model, dataloader, num_epochs, dataset_size, device):
             epoch_accuracy[phase] = running_corrects.double() / dataset_size[phase]
             print('  {} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss[phase], epoch_accuracy[phase]))
 
+            # save best model
+            if epoch_accuracy['val'] > top_accuracy:
+                print('best model ever! save at global step {}'.format(epoch))
+                save_model(model, tag='top')
+
         writer.add_scalars('loss', {'train': epoch_loss['train'], 'val': epoch_loss['val']}, epoch)
         writer.add_scalars('accuracy', {'train': epoch_accuracy['train'], 'val': epoch_accuracy['val']}, epoch)
     
@@ -104,17 +120,17 @@ def evaluate(model, dataloader, dataset_size, device):
 
 def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
-    dataloader, dataset_size = load_data(args.dataset_dir, args.batch_size, args.num_workers)
-    model = HCN()
+    dataset_dir = os.path.join(args.dataset_dir, 'Data/skeleton_processed')
+    dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
+    model = HCN(sequence_length=args.sequence_length)
     if args.gpu and torch.cuda.is_available():
         model = torch.nn.DataParallel(model)
     model.to(device)
     model = train(model, dataloader, args.num_epochs, dataset_size, device)
-    torch.save(model.module.state_dict(), args.checkpoint_path)
+    save_model(model, tag='final')
     writer.close()
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
     main()
-
