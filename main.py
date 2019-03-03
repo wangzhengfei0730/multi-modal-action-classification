@@ -98,6 +98,7 @@ def train(model, dataloader, num_epochs, dataset_size, device):
             if epoch_accuracy['val'] > top_accuracy:
                 print('best model ever! save at global step {}'.format(epoch))
                 save_model(model, tag='top')
+                top_accuracy = epoch_accuracy['val']
 
         writer.add_scalars('loss', {'train': epoch_loss['train'], 'val': epoch_loss['val']}, epoch)
         writer.add_scalars('accuracy', {'train': epoch_accuracy['train'], 'val': epoch_accuracy['val']}, epoch)
