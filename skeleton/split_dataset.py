@@ -6,7 +6,7 @@ import shutil
 NUM_ACTIONS = 51
 VALIDATION_RATE = 0.1
 TEST_RATE = 0.1
-dataset_dir = './PKUMMDv2/Data/skeleton_processed/'
+dataset_dir = '../PKUMMDv2/Data/skeleton_processed/'
 
 for tag in ['train', 'val', 'test']:
     # train/val/test directory

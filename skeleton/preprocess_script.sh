@@ -1,5 +1,5 @@
 dataset_version=$1
-dataset_directory='./PKUMMDv'$dataset_version
+dataset_directory='../PKUMMDv'$dataset_version
 echo 'dataset version: '$dataset_directory
 
 processed_directory=$dataset_directory'/Data/skeleton_processed'
