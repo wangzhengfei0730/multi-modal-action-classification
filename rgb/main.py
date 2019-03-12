@@ -156,7 +156,7 @@ def evaluate(model, dataloader, dataset_size, device):
 
 def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
-    dataset_dir = os.path.join(args.dataset_dir, 'Data/skeleton_processed')
+    dataset_dir = os.path.join(args.dataset_dir, 'Data/RGB')
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
     spatial_network, temporal_network = SpatialStreamConvNet(), TemporalStreamConvNet()
     if args.gpu and torch.cuda.is_available():

@@ -7,7 +7,7 @@ NUM_FRAME_SAMPLE = 16
 
 video_dir = '../PKUMMDv1/Data/RGB_VIDEO'
 label_dir = '../PKUMMDv1/Label'
-rgb_frame_dir = '../PKUMMDv1/Data/RGB/frame'
+rgb_frame_dir = '../PKUMMDv1/Data/RGB/rgb'
 optical_flow_dir = '../PKUMMDv1/Data/RGB/optical_flow'
 if not os.path.exists(rgb_frame_dir):
     os.mkdir(rgb_frame_dir)
@@ -47,14 +47,8 @@ def preprocess_video(data_id):
         cur_action_class = action_classes[i]
         print('  No.{:02} action, belongs to class {:02}'.format(i + 1, cur_action_class))
 
-        cur_rgb_dir_class = os.path.join(rgb_frame_dir, '{:02}'.format(cur_action_class))
-        cur_optical_flow_dir_class = os.path.join(optical_flow_dir, '{:02}'.format(cur_action_class))
-        if not os.path.exists(cur_rgb_dir_class):
-            os.mkdir(cur_rgb_dir_class)
-        if not os.path.exists(cur_optical_flow_dir_class):
-            os.mkdir(cur_optical_flow_dir_class)
-        cur_rgb_dir = os.path.join(cur_rgb_dir_class, data_id)
-        cur_optical_flow_dir = os.path.join(cur_optical_flow_dir_class, data_id)
+        cur_rgb_dir = os.path.join(rgb_frame_dir, '{:02}'.format(cur_action_class))
+        cur_optical_flow_dir = os.path.join(optical_flow_dir, '{:02}'.format(cur_action_class))
         if not os.path.exists(cur_rgb_dir):
             os.mkdir(cur_rgb_dir)
         if not os.path.exists(cur_optical_flow_dir):
