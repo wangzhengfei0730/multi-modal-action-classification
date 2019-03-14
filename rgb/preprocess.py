@@ -56,6 +56,7 @@ def preprocess_video(data_id):
 
         start_frame, end_frame = start_frames[i], end_frames[i]
         frame_interval = round((end_frame - start_frame) / NUM_FRAME_SAMPLE)
+        frame_interval = max(frame_interval, 1)
         frame_count = 0
 
         # optical flow frame
