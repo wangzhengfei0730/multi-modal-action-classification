@@ -42,7 +42,7 @@ def pickle_loader(path):
 def load_data(dataset_dir, batch_size, num_workers):
     if args.evaluation:
         test_dataset = {
-            stream: datasets.ImageFolder(root=dataset_dir + 'test/{0}'.format(stream), transform=transform)
+            stream: datasets.ImageFolder(root=dataset_dir + '{0}/test'.format(stream), transform=transform)
             for stream in TYPE_STREAMS
         }
         test_dataset_loader = {
@@ -52,7 +52,7 @@ def load_data(dataset_dir, batch_size, num_workers):
         return test_dataset_loader, len(test_dataset)
     else:
         train_val_dataset = {
-            '{0}/{1}'.format(tag, stream): datasets.ImageFolder(root=dataset_dir + '{0}/{1}'.format(tag, stream), transform=transform)
+            '{0}/{1}'.format(tag, stream): datasets.ImageFolder(root=dataset_dir + '{0}/{1}'.format(stream, tag), transform=transform)
             for tag in ['train', 'val'] for stream in TYPE_STREAMS
         }
         train_val_dataset_size = {
@@ -112,7 +112,7 @@ def train(spatial_network, temporal_network, dataloader, num_epochs, dataset_siz
                         loss = nn.CrossEntropyLoss()(outputs, labels)
                         if phase is 'train':
                             loss.backward()
-                            optimizer.step()
+                            optimizer[stream].step()
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(preds == labels.data)
                 
@@ -127,7 +127,7 @@ def train(spatial_network, temporal_network, dataloader, num_epochs, dataset_siz
                 if epoch_accuracy['{0}/{1}'.format(phase, stream)] > top_accuracy[stream]:
                     print('best {0} model ever! save at global step {1}'.format(stream, epoch))
                     save_model(model[stream], tag='top', stream=stream)
-                    top_accuracy = epoch_accuracy['{0}/{1}'.format(phase, stream)]
+                    top_accuracy[stream] = epoch_accuracy['{0}/{1}'.format(phase, stream)]
 
         writer.add_scalars('loss', {
             '{0}/{1}'.format(phase, stream): epoch_loss['{0}/{1}'.format(phase, stream)]
@@ -156,7 +156,7 @@ def evaluate(model, dataloader, dataset_size, device):
 
 def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
-    dataset_dir = os.path.join(args.dataset_dir, 'Data/RGB')
+    dataset_dir = '../' + args.dataset_dir + '/Data/RGB/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
     spatial_network, temporal_network = SpatialStreamConvNet(), TemporalStreamConvNet()
     if args.gpu and torch.cuda.is_available():

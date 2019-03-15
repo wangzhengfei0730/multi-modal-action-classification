@@ -28,7 +28,7 @@ for tag in ['train', 'val', 'test']:
 
 # rgb
 print('processing rgb ...')
-for i in range(NUM_ACTION_CLASSES):
+for i in range(1, NUM_ACTION_CLASSES + 1):
     class_dir = os.path.join(rgb_dir, '{:02}'.format(i))
     if not os.path.exists(class_dir):
         continue
@@ -61,7 +61,7 @@ for i in range(NUM_ACTION_CLASSES):
 
 # optical flow
 print('processing optical flow ...')
-for i in range(NUM_ACTION_CLASSES):
+for i in range(1, NUM_ACTION_CLASSES + 1):
     class_dir = os.path.join(optical_flow_dir, '{:02}'.format(i))
     if not os.path.exists(class_dir):
         continue
