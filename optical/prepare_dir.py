@@ -8,20 +8,13 @@ VALIDATION_RATE = 0.1
 TEST_RATE = 0.1
 
 data_dir = '../PKUMMDv1/Data/RGB'
-rgb_dir = os.path.join(data_dir, 'rgb')
 optical_dir = os.path.join(data_dir, 'optical')
 
 for tag in ['train', 'val', 'test']:
-    rgb_tag_dir = os.path.join(rgb_dir, tag)
-    if not os.path.exists(rgb_tag_dir):
-        os.mkdir(rgb_tag_dir)
     optical_flow_tag_dir = os.path.join(optical_dir, tag)
     if not os.path.exists(optical_flow_tag_dir):
         os.mkdir(optical_flow_tag_dir)
     for i in range(1, NUM_ACTION_CLASSES + 1):
-        rgb_class_dir = os.path.join(rgb_tag_dir, '{:02}'.format(i))
-        if not os.path.exists(rgb_class_dir):
-            os.mkdir(rgb_class_dir)
         optical_class_dir = os.path.join(optical_flow_tag_dir, '{:02}'.format(i))
         if not os.path.exists(optical_class_dir):
             os.mkdir(optical_class_dir)
