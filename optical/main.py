@@ -7,9 +7,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets
+from torchvision.models import *
 from torchvision.transforms import transforms
 from tensorboardX import SummaryWriter
-from model import TemporalStreamConvNet
 
 
 writer = SummaryWriter()
@@ -23,9 +23,9 @@ transform = transforms.Compose([
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset-dir', type=str, default='PKUMMDv1', help='dataset directory')
 parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
-parser.add_argument('--batch-size', type=int, default=64, help='batch size')
-parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
-parser.add_argument('--num-epochs', type=int, default=400, help='number of epochs for training')
+parser.add_argument('--batch-size', type=int, default=128, help='batch size')
+parser.add_argument('--learning-rate', type=float, default=1e-5, help='learning rate')
+parser.add_argument('--num-epochs', type=int, default=50, help='number of epochs for training')
 parser.add_argument('--num-workers', type=int, default=4, help='number of workers for multiprocessing')
 parser.add_argument('--checkpoint-path', type=str, default='checkpoint.pt', help='checkpoint file path')
 parser.add_argument('--seed', type=int, default=429, help='random seed')
@@ -149,7 +149,7 @@ def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
     dataset_dir = '../' + args.dataset_dir + '/Data/RGB/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
-    model = TemporalStreamConvNet()
+    model = resnet18(num_classes=51)
     if args.gpu and torch.cuda.is_available():
         model = torch.nn.DataParallel(model)
     model.to(device)
