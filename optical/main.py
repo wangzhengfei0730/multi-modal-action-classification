@@ -7,9 +7,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torchvision.models.resnet import resnet50
 from torchvision.transforms import transforms
 from tensorboardX import SummaryWriter
+from model import TemporalStreamConvNet
 
 
 writer = SummaryWriter()
@@ -115,10 +115,10 @@ def train(model, dataloader, num_epochs, dataset_size, device):
                 epoch_accuracy['{0}/optical'.format(phase)]
             ))
 
-            if epoch_accuracy['{0}/optical'.format(phase)] > top_accuracy:
-                print('best optical model ever! save at global step {0}'.format(epoch))
-                save_model(model, tag='top')
-                top_accuracy = epoch_accuracy['{0}/optical'.format(phase)]
+        if epoch_accuracy['val/optical'] > top_accuracy:
+            print('best optical model ever! save at global step {0}'.format(epoch))
+            save_model(model, tag='top')
+            top_accuracy = epoch_accuracy['val/optical']
 
         writer.add_scalars('loss', {
             '{0}/optical'.format(phase): epoch_loss['{0}/optical'.format(phase)]
@@ -149,7 +149,7 @@ def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
     dataset_dir = '../' + args.dataset_dir + '/Data/RGB/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
-    model = resnet50(num_classes=51)
+    model = TemporalStreamConvNet()
     if args.gpu and torch.cuda.is_available():
         model = torch.nn.DataParallel(model)
     model.to(device)
