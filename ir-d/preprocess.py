@@ -1,5 +1,5 @@
 import os
-import threading, multiprocessing
+import multiprocessing
 import numpy as np
 import cv2
 
@@ -48,7 +48,7 @@ def preprocess_video(data_id):
             
         for i in range(num_actions):
             cur_action_class = action_classes[i]
-            # print('  No.{:02} action, belongs to class {:02}'.format(i + 1, cur_action_class))
+            # print('  {0}-No.{1:02} action, belongs to class {2:02}'.format(data_id, i + 1, cur_action_class))
 
             cur_ird_dir = os.path.join(ird_dir, '{:02}'.format(cur_action_class))
             if not os.path.exists(cur_ird_dir):
@@ -91,14 +91,14 @@ def preprocess_video(data_id):
 label_filenames = sorted(os.listdir(label_dir))
 i = 0
 while i < len(label_filenames):
-    threads = []
+    processes = []
     for j in range(multiprocessing.cpu_count()):
         if i >= len(label_filenames):
             continue
         data_id = label_filenames[i].split('.')[0]
         i += 1
-        t = threading.Thread(target=preprocess_video, args=(data_id, ))
-        t.start()
-        threads.append(t)
-    for t in threads:
-        t.join()
+        p = multiprocessing.Process(target=preprocess_video, args=(data_id, ))
+        p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
