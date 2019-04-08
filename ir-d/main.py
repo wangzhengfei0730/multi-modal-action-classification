@@ -16,8 +16,7 @@ writer = SummaryWriter()
 transform = transforms.Compose([
     transforms.Resize(255),
     transforms.RandomCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.ToTensor()
 ])
 
 parser = argparse.ArgumentParser()
@@ -30,6 +29,7 @@ parser.add_argument('--num-workers', type=int, default=8, help='number of worker
 parser.add_argument('--checkpoint-path', type=str, default='checkpoint.pt', help='checkpoint file path')
 parser.add_argument('--seed', type=int, default=429, help='random seed')
 parser.add_argument('--evaluation', default=False, action='store_true', help='whether to evaluate the model')
+parser.add_argument('--model-path', type=str, default='top-checkpoint.pt', help='model parameter file path')
 
 
 def pickle_loader(path):
@@ -113,13 +113,13 @@ def train(model, dataloader, num_epochs, dataset_size, device):
 def evaluate(model, dataloader, dataset_size, device):
     model.eval()
     corrects = 0
-    for inputs, labels in dataloader['test']:
+    for inputs, labels in dataloader:
         inputs = inputs.to(device)
         labels = labels.to(device)
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
         corrects += torch.sum(preds == labels.data)
-    acc = corrects.double() / dataset_size['test']
+    acc = corrects.double() / dataset_size
     return acc.item()
 
 
@@ -127,12 +127,20 @@ def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
     dataset_dir = '../' + args.dataset_dir + '/Data/IRD/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
-    model = resnet18(num_classes=51)
-    if args.gpu and torch.cuda.is_available():
-        model = torch.nn.DataParallel(model)
-    model.to(device)
-    model = train(model, dataloader, args.num_epochs, dataset_size, device)
-    save_model(model, tag='final')
+    if args.evaluation is False:
+        model = resnet18(num_classes=51)
+        if args.gpu and torch.cuda.is_available():
+            model = torch.nn.DataParallel(model)
+        model.to(device)
+        model = train(model, dataloader, args.num_epochs, dataset_size, device)
+        save_model(model, tag='final')
+    else:
+        model = resnet18(num_classes=51)
+        model.to(device)
+        model.load_state_dict(torch.load(args.model_path))
+        test_accuracy = evaluate(model, dataloader, dataset_size, device)
+        print('test accuracy: {:.4f}'.format(test_accuracy))
+    
     writer.close()
 
 
