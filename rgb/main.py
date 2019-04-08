@@ -11,6 +11,7 @@ from torchvision.transforms import transforms
 from tensorboardX import SummaryWriter
 
 from model import SpatialStreamConvNet, TemporalStreamConvNet
+from torchvision.models.resnet import *
 
 TYPE_STREAMS = ['rgb', 'optical_flow']
 writer = SummaryWriter()
@@ -32,6 +33,8 @@ parser.add_argument('--num-workers', type=int, default=4, help='number of worker
 parser.add_argument('--checkpoint-path', type=str, default='checkpoint.pt', help='checkpoint file path')
 parser.add_argument('--seed', type=int, default=429, help='random seed')
 parser.add_argument('--evaluation', default=False, action='store_true', help='whether to evaluate the model')
+parser.add_argument('--model-path', type=str, default='top-checkpoint.pt', help='model parameter file path')
+
 
 
 def pickle_loader(path):
@@ -45,11 +48,12 @@ def load_data(dataset_dir, batch_size, num_workers):
             stream: datasets.ImageFolder(root=dataset_dir + '{0}/test'.format(stream), transform=transform)
             for stream in TYPE_STREAMS
         }
+        test_dataset_size = {stream: len(test_dataset[stream]) for stream in TYPE_STREAMS}
         test_dataset_loader = {
             stream: DataLoader(test_dataset[stream], batch_size=batch_size, shuffle=True, num_workers=num_workers)
             for stream in TYPE_STREAMS
         }
-        return test_dataset_loader, len(test_dataset)
+        return test_dataset_loader, test_dataset_size
     else:
         train_val_dataset = {
             '{0}/{1}'.format(tag, stream): datasets.ImageFolder(root=dataset_dir + '{0}/{1}'.format(stream, tag), transform=transform)
@@ -144,13 +148,13 @@ def train(spatial_network, temporal_network, dataloader, num_epochs, dataset_siz
 def evaluate(model, dataloader, dataset_size, device):
     model.eval()
     corrects = 0
-    for inputs, labels in dataloader['test']:
+    for inputs, labels in dataloader['rgb']:
         inputs = inputs.to(device)
         labels = labels.to(device)
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
         corrects += torch.sum(preds == labels.data)
-    acc = corrects.double() / dataset_size['test']
+    acc = corrects.double() / dataset_size['rgb']
     return acc.item()
 
 
@@ -158,15 +162,23 @@ def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
     dataset_dir = '../' + args.dataset_dir + '/Data/RGB/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
-    spatial_network, temporal_network = SpatialStreamConvNet(), TemporalStreamConvNet()
-    if args.gpu and torch.cuda.is_available():
-        spatial_network = torch.nn.DataParallel(spatial_network)
-        temporal_network = torch.nn.DataParallel(temporal_network)
-    spatial_network.to(device)
-    temporal_network.to(device)
-    model = train(spatial_network, temporal_network, dataloader, args.num_epochs, dataset_size, device)
-    for stream in TYPE_STREAMS:
-        save_model(model[stream], tag='final', stream=stream)
+    if args.evaluation is False:
+        spatial_network, temporal_network = SpatialStreamConvNet(), TemporalStreamConvNet()
+        if args.gpu and torch.cuda.is_available():
+            spatial_network = torch.nn.DataParallel(spatial_network)
+            temporal_network = torch.nn.DataParallel(temporal_network)
+        spatial_network.to(device)
+        temporal_network.to(device)
+        model = train(spatial_network, temporal_network, dataloader, args.num_epochs, dataset_size, device)
+        for stream in TYPE_STREAMS:
+            save_model(model[stream], tag='final', stream=stream)
+    else:
+        model = resnet101(num_classes=51)
+        model.to(device)
+        model.load_state_dict(torch.load(args.model_path))
+        test_accuracy = evaluate(model, dataloader, dataset_size, device)
+        print('test accuracy: {:.4f}'.format(test_accuracy))
+
     writer.close()
 
 
