@@ -1,7 +1,8 @@
+.vscode/
 __pycache__/
 *.pyc
-.ipynb_checkpoints/
 PKUMMDv*/
-*runs/
-.vscode/
+checkpoint/
+tensorboard/
+featuremaps/
 *.pt
