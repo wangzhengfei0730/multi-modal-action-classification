@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import transforms
-from torchvision.models.resnet import resnet101
+from torchvision.models.resnet import resnet18
 
 transform = transforms.Compose([
     transforms.Resize(224),
@@ -23,13 +23,12 @@ parser.add_argument('--dataset-dir', type=str, default='PKUMMDv1', help='dataset
 parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
 parser.add_argument('--batch-size', type=int, default=1, help='batch size')
 parser.add_argument('--num-workers', type=int, default=4, help='number of workers for multiprocessing')
-parser.add_argument('--checkpoint-path', type=str, default='top-rgb-checkpoint.pt', help='checkpoint file path')
-parser.add_argument('--model-path', type=str, default='top-rgb-checkpoint.pt', help='model parameter file path')
+parser.add_argument('--model-path', type=str, default='top-ird-checkpoint.pt', help='model parameter file path')
 parser.add_argument('--selected-layer', type=str, default='conv1', help='layers name want to be visualized')
 
 
 def load_data(dataset_dir, batch_size, num_workers):
-    vis_dataset = datasets.ImageFolder(root=dataset_dir + 'rgb/vis', transform=transform)
+    vis_dataset = datasets.ImageFolder(root=dataset_dir + 'vis', transform=transform)
     vis_dataset_size = len(vis_dataset)
     vis_dataset_loader = DataLoader(vis_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     return vis_dataset_loader, vis_dataset_size
@@ -51,10 +50,10 @@ def visualize(model, dataloader, dataset_size, device, selected_layer):
 
 def main():
     device = torch.device('cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu')
-    dataset_dir = '../' + args.dataset_dir + '/Data/RGB/'
+    dataset_dir = '../' + args.dataset_dir + '/Data/IRD/'
     dataloader, dataset_size = load_data(dataset_dir, args.batch_size, args.num_workers)
     
-    model = resnet101(num_classes=51)
+    model = resnet18(num_classes=51)
     model.to(device)
     model.load_state_dict(torch.load(args.model_path, map_location='cpu'))
     vis_results = visualize(model, dataloader, dataset_size, device, args.selected_layer)
