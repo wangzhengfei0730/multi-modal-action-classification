@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torchvision.models import *
+from torchvision.models import resnet18
 from torchvision.transforms import transforms
 from tensorboardX import SummaryWriter
 
@@ -16,8 +16,7 @@ writer = SummaryWriter()
 transform = transforms.Compose([
     transforms.Resize(255),
     transforms.RandomCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.ToTensor()
 ])
 
 parser = argparse.ArgumentParser()
@@ -25,8 +24,8 @@ parser.add_argument('--dataset-dir', type=str, default='PKUMMDv1', help='dataset
 parser.add_argument('--gpu', default=False, action='store_true', help='whether to use gpus for training')
 parser.add_argument('--batch-size', type=int, default=128, help='batch size')
 parser.add_argument('--learning-rate', type=float, default=1e-5, help='learning rate')
-parser.add_argument('--num-epochs', type=int, default=50, help='number of epochs for training')
-parser.add_argument('--num-workers', type=int, default=4, help='number of workers for multiprocessing')
+parser.add_argument('--num-epochs', type=int, default=10000, help='number of epochs for training')
+parser.add_argument('--num-workers', type=int, default=8, help='number of workers for multiprocessing')
 parser.add_argument('--checkpoint-path', type=str, default='checkpoint.pt', help='checkpoint file path')
 parser.add_argument('--seed', type=int, default=429, help='random seed')
 parser.add_argument('--evaluation', default=False, action='store_true', help='whether to evaluate the model')
