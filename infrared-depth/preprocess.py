@@ -37,6 +37,9 @@ def preprocess_video(data_id):
         label_path = os.path.join(label_dir, data_id + '.txt')
         depth_video_path = os.path.join(depth_video_dir, data_id + '-depth.avi')
         ir_video_path = os.path.join(ir_video_dir, data_id + '-infrared.avi')
+        if not os.path.exists(depth_video_path) or not os.path.exists(ir_video_path):
+            print('video file not exists...')
+            raise Exception
 
         depth_cap = cv2.VideoCapture(depth_video_path)
         ir_cap = cv2.VideoCapture(ir_video_path)
@@ -63,8 +66,9 @@ def preprocess_video(data_id):
                 _, ir_frame = ir_cap.read()
                 frame_id += 1
                 
+            cur_frame_id = 0
             while frame_id < end_frame:
-                if frame_id % frame_interval == 0:
+                if (cur_frame_id + 1) % frame_interval == 0:
                     filter_frame = np.zeros_like(np.array(ir_frame))
                     ir_frame = np.uint8(np.clip((10 * ir_frame + 50), 0, 255))
                     depth_gray = cv2.cvtColor(depth_frame, cv2.COLOR_BGR2GRAY)
@@ -82,6 +86,7 @@ def preprocess_video(data_id):
                     frame_count += 1
                 
                 frame_id += 1
+                cur_frame_id += 1
                 _, depth_frame = depth_cap.read()
                 _, ir_frame = ir_cap.read()
     except Exception:
