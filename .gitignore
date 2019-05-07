@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 PKUMMDv*/
+data_sample/
 checkpoint/
 tensorboard/
 featuremaps/
