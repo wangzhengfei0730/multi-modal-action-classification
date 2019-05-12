@@ -26,6 +26,12 @@ data_transforms = transforms.Compose([
     transforms.RandomCrop(224),
     transforms.ToTensor()
 ])
+rgb_image_transforms = transforms.Compose([
+    transforms.Resize(255),
+    transforms.RandomCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
 
 
 def load_data(data_dir, data_id, start_time, end_time):
@@ -133,7 +139,10 @@ def predict(models, inputs):
             x = x.unsqueeze(0)
         else:
             x = Image.fromarray(x.astype('uint8')).convert('RGB')
-            x = data_transforms(x).float()
+            if modal == 'rgb':
+                x = rgb_image_transforms(x).float()
+            else:
+                x = data_transforms(x).float()
             x = x.unsqueeze(0)
         output = model(x)
         _, prediction = torch.max(output, 1)
