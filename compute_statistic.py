@@ -1,5 +1,8 @@
 import os
 import matplotlib
+# Ubuntu
+# matplotlib.use('Agg')
+# Mac
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -23,8 +26,8 @@ def parse_label(label_path):
 
 NUM_ACTIONS =  51
 
-dataset_dir = './PKUMMDv2/'
-skeleton_dir = os.path.join(dataset_dir, 'Data/skeleton')
+dataset_dir = './PKUMMDv1/'
+skeleton_dir = os.path.join(dataset_dir, 'Data/SKELETON')
 label_dir = os.path.join(dataset_dir, 'Label')
 print('skeleton directory:', skeleton_dir)
 print('label directory:', label_dir)
@@ -56,7 +59,7 @@ for i in range(NUM_ACTIONS):
     else:
         sum_data[i] /= num_data[i]
 average_data = sum_data
-print('PKU-MMD v2 does not contain data in class:', no_data_classes)
+print('PKU-MMD v1 does not contain data in class:', no_data_classes)
 
 actions = [i for i in range(1, NUM_ACTIONS + 1)]
 # number of each action class
