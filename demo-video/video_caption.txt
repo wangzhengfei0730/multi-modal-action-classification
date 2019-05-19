@@ -1,0 +1,129 @@
+model weight initialization finished!
+model initialization finished...
+action #1
+ timestamp #182:
+/Users/wangzhengfei/anaconda3/envs/py36/lib/python3.6/site-packages/torch/nn/functional.py:2351: UserWarning: nn.functional.upsample is deprecated. Use nn.functional.interpolate instead.
+  warnings.warn("nn.functional.upsample is deprecated. Use nn.functional.interpolate instead.")
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 42, 16, 31]
+ timestamp #183:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 31, 26, 31]
+ timestamp #184:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 24, 4, 21, 26, 31]
+ timestamp #185:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 24, 4, 21, 16, 31]
+ timestamp #186:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 24, 4, 31, 16, 31]
+ timestamp #187:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 31, 16, 31]
+ timestamp #188:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 20, 4, 31, 33, 31]
+ timestamp #189:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 33, 31]
+ timestamp #190:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 31, 26, 31]
+ timestamp #191:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 43, 10, 31]
+ timestamp #192:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 16, 4, 43, 10, 31]
+ timestamp #193:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 47, 4, 31, 16, 31]
+ timestamp #194:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 8, 31]
+ timestamp #195:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 8, 31]
+ timestamp #196:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 43, 16, 31]
+ timestamp #197:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 46, 4, 31, 33, 31]
+ timestamp #198:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 16, 4, 31, 8, 31]
+ timestamp #199:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 16, 31]
+ timestamp #200:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 16, 4, 31, 8, 31]
+ timestamp #201:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 33, 31]
+ timestamp #202:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 8, 31]
+ timestamp #203:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #204:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #205:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 2, 4, 31, 8, 31]
+ timestamp #206:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 1, 4, 31, 8, 31]
+ timestamp #207:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 1, 4, 31, 36, 31]
+ timestamp #208:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 34, 4, 31, 33, 31]
+ timestamp #209:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 27, 4, 31, 8, 31]
+ timestamp #210:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 20, 4, 31, 8, 31]
+ timestamp #211:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 1, 4, 31, 8, 31]
+ timestamp #212:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 44, 4, 31, 10, 31]
+ timestamp #213:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 33, 31]
+ timestamp #214:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #215:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 24, 4, 31, 8, 31]
+ timestamp #216:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #217:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #218:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 8, 31]
+ timestamp #219:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 31, 4, 31, 10, 31]
+ timestamp #220:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 26, 4, 31, 8, 31]
+ timestamp #221:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 38, 4, 31, 8, 31]
+ timestamp #222:
+ > label = 31, vote winner = 31
+ >> prediction = [31, 16, 4, 31, 10, 31]
+ timestamp #223:
