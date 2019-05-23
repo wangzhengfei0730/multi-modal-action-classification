@@ -88,7 +88,8 @@ class HCN(nn.Module):
         N, D, T, J, P = x.size()
         motion = x[:,:,1::,:,:] - x[:,:,0:-1,:,:]
         motion = motion.permute(0, 1, 4, 2, 3).contiguous().view(N, D * P, T - 1, J)
-        motion = F.upsample(motion, size=(T, J), mode='bilinear', align_corners=False).contiguous().view(N, D, P, T, J).permute(0, 1, 3, 4, 2)
+        motion = F.upsample(motion, size=(T, J), mode='bilinear', align_corners=False).contiguous()\
+            .view(N, D, P, T, J).permute(0, 1, 3, 4, 2)
 
         logits = []
         for i in range(self.num_persons):

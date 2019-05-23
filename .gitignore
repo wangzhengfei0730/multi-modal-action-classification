@@ -7,3 +7,4 @@ checkpoint/
 tensorboard/
 featuremaps/
 *.pt
+*.txt
