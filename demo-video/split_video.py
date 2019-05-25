@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 from data_load_utils import parse_label
 
-FPS = 30
-ACTION_ID = 5 - 1
+FPS = 25
+ACTION_ID = 4
 
 
 def split(video_path, start_timestamp, end_timestamp):
